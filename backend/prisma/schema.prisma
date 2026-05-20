@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Plan {
+  id             String   @id @default(cuid())
+  title          String
+  goals          String
+  available_time Int
+  created_at     DateTime @default(now())
+
+  tasks Task[]
+
+  @@map("plans")
+}
+
+model Task {
+  id         String  @id @default(cuid())
+  plan_id    String
+  time_block String
+  task       String
+  completed  Boolean @default(false)
+
+  plan Plan @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+}
