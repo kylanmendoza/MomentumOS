@@ -5,12 +5,12 @@ const prisma = new PrismaClient();
 
 export async function generatePlan(req, res, next) {
   try {
-    const { goals, hours, title } = req.body;
+    const { goals, hours, scheduleType = "daily" } = req.body;
     if (!goals || !hours) {
       return res.status(400).json({ error: "goals and hours are required" });
     }
 
-    const schedule = await generateSchedule({ goals, hours });
+    const schedule = await generateSchedule({ goals, hours, scheduleType });
     res.json({ schedule });
   } catch (err) {
     next(err);
@@ -19,7 +19,7 @@ export async function generatePlan(req, res, next) {
 
 export async function savePlan(req, res, next) {
   try {
-    const { title, goals, available_time, tasks } = req.body;
+    const { title, goals, available_time, schedule_type = "daily", tasks } = req.body;
     if (!title || !goals || !available_time || !tasks?.length) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -29,6 +29,7 @@ export async function savePlan(req, res, next) {
         title,
         goals,
         available_time: Number(available_time),
+        schedule_type,
         tasks: {
           create: tasks.map((t) => ({
             time_block: t.time,
