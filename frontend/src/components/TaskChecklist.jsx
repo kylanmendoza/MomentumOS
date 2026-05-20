@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { toggleTask } from "../api/index.js";
+import { toStandardTime } from "../utils/time.js";
 
 export default function TaskChecklist({ tasks = [], onUpdate }) {
   async function handleToggle(task) {
@@ -70,7 +71,7 @@ export default function TaskChecklist({ tasks = [], onUpdate }) {
                 className="text-xs font-medium text-accent-light/70 block mb-0.5"
                 style={{ fontVariantNumeric: "tabular-nums" }}
               >
-                {task.time_block}
+                {toStandardTime(task.time_block)}
               </span>
               <span
                 className="text-sm text-white/80 leading-snug"

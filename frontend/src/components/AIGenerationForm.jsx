@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { generatePlan, savePlan } from "../api/index.js";
+import { toStandardTime } from "../utils/time.js";
 
 const PLACEHOLDERS = {
   goals:
@@ -221,7 +222,7 @@ export default function AIGenerationForm({ onSaved }) {
                   style={{ background: "rgba(124,58,237,0.08)" }}
                 >
                   <span className="text-accent-light/70 font-mono text-xs flex-shrink-0 pt-0.5">
-                    {block.time}
+                    {toStandardTime(block.time)}
                   </span>
                   <span className="text-white/70">{block.task}</span>
                 </div>

@@ -14,10 +14,11 @@ Rules:
 - Include short breaks every 90 minutes
 - Make tasks actionable and specific
 - Keep it realistic for one day
+- Use standard 12-hour time format with AM/PM (e.g. 9:00 AM - 9:45 AM)
 - Output ONLY valid JSON — no markdown, no explanation:
 
 [
-  { "time": "HH:MM-HH:MM", "task": "..." }
+  { "time": "H:MM AM - H:MM PM", "task": "..." }
 ]`;
 
   const response = await client.chat.completions.create({
