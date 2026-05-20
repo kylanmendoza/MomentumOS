@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { toStandardTime } from "../utils/time.js";
 
 function getBlockColor(task) {
   const lower = task.toLowerCase();
@@ -51,12 +52,18 @@ export default function TimelinePlanner({ tasks = [] }) {
                 }}
               />
 
-              {/* Time */}
+              {/* Time / Day / Week label */}
               <span
-                className="text-[11px] font-mono font-medium flex-shrink-0 pt-0.5"
-                style={{ color: colors.text, minWidth: 96 }}
+                className="text-[11px] font-medium flex-shrink-0 pt-0.5"
+                style={{
+                  color: colors.text,
+                  minWidth: 72,
+                  fontFamily: /^\d/.test(task.time_block || task.time || "")
+                    ? "monospace"
+                    : "inherit",
+                }}
               >
-                {task.time_block || task.time}
+                {toStandardTime(task.time_block || task.time)}
               </span>
 
               {/* Task */}

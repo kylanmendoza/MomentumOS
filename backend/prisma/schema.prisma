@@ -12,6 +12,7 @@ model Plan {
   title          String
   goals          String
   available_time Int
+  schedule_type  String   @default("daily")
   created_at     DateTime @default(now())
 
   tasks Task[]

@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { generatePlan, savePlan } from "../api/index.js";
+import { toStandardTime } from "../utils/time.js";
+
+const SCHEDULE_TYPES = [
+  { value: "daily",   label: "Daily",   desc: "Time-blocked schedule for one day" },
+  { value: "weekly",  label: "Weekly",  desc: "Goals spread across 7 days" },
+  { value: "monthly", label: "Monthly", desc: "Milestones across 4 weeks" },
+  { value: "yearly",  label: "Yearly",  desc: "High-level goals by month" },
+];
 
 const PLACEHOLDERS = {
   goals:
@@ -9,7 +17,7 @@ const PLACEHOLDERS = {
 };
 
 export default function AIGenerationForm({ onSaved }) {
-  const [form, setForm] = useState({ title: "", goals: "", hours: 8, priorities: "" });
+  const [form, setForm] = useState({ title: "", goals: "", hours: 8, priorities: "", scheduleType: "daily" });
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState(null);
@@ -32,6 +40,7 @@ export default function AIGenerationForm({ onSaved }) {
       const res = await generatePlan({
         goals: form.priorities ? `${form.goals}. Priorities: ${form.priorities}` : form.goals,
         hours: Number(form.hours),
+        scheduleType: form.scheduleType,
       });
       setPreview(res.data.schedule);
     } catch (err) {
@@ -46,9 +55,10 @@ export default function AIGenerationForm({ onSaved }) {
     setLoading(true);
     try {
       await savePlan({
-        title: form.title || `Plan — ${new Date().toLocaleDateString()}`,
+        title: form.title || `${form.scheduleType.charAt(0).toUpperCase() + form.scheduleType.slice(1)} Plan — ${new Date().toLocaleDateString()}`,
         goals: form.goals,
         available_time: Number(form.hours),
+        schedule_type: form.scheduleType,
         tasks: preview,
       });
       setSaved(true);
@@ -87,6 +97,34 @@ export default function AIGenerationForm({ onSaved }) {
               (e.target.style.borderColor = "rgba(255,255,255,0.08)")
             }
           />
+        </div>
+
+        {/* Schedule Type */}
+        <div>
+          <label className="block text-xs font-medium text-white/40 uppercase tracking-widest mb-2">
+            Schedule Type
+          </label>
+          <div className="grid grid-cols-4 gap-2">
+            {SCHEDULE_TYPES.map((type) => (
+              <button
+                key={type.value}
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, scheduleType: type.value }))}
+                className="flex flex-col items-center gap-1 p-2.5 rounded-xl text-center transition-all duration-200"
+                style={{
+                  background: form.scheduleType === type.value
+                    ? "rgba(124,58,237,0.2)"
+                    : "rgba(255,255,255,0.03)",
+                  border: form.scheduleType === type.value
+                    ? "1px solid rgba(124,58,237,0.5)"
+                    : "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <span className="text-xs font-medium text-white/80">{type.label}</span>
+                <span className="text-[10px] text-white/30 leading-tight">{type.desc}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Goals */}
@@ -221,7 +259,7 @@ export default function AIGenerationForm({ onSaved }) {
                   style={{ background: "rgba(124,58,237,0.08)" }}
                 >
                   <span className="text-accent-light/70 font-mono text-xs flex-shrink-0 pt-0.5">
-                    {block.time}
+                    {toStandardTime(block.time)}
                   </span>
                   <span className="text-white/70">{block.task}</span>
                 </div>
