@@ -25,6 +25,8 @@ model Task {
   plan_id    String
   time_block String
   task       String
+  category   String  @default("deep_work")
+  priority   String  @default("medium")
   completed  Boolean @default(false)
 
   plan Plan @relation(fields: [plan_id], references: [id], onDelete: Cascade)

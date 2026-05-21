@@ -34,6 +34,8 @@ export async function savePlan(req, res, next) {
           create: tasks.map((t) => ({
             time_block: t.time,
             task: t.task,
+            category: t.category || "deep_work",
+            priority: t.priority || "medium",
           })),
         },
       },
