@@ -72,9 +72,22 @@ ${config.rules.map((r) => `- ${r}`).join("\n")}
 
   const response = await client.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.7,
-    response_format: { type: "json_object" },
+    messages: [
+      { 
+        role: "system", 
+        content: `You are an elite productivity coach and scheduling expert.
+        Your schedules are:
+        - Realistic, never over-packed
+        - Structured around human energy patterns (peak focus → admin → wind-down)
+        - Specific and actionable - never vague
+        - Always include cognitive breaks
+        You output ONLY valid JSON. Never explain yourself.`
+      },
+      {
+        role: "user",
+        content: `Creat a ${scheduleType} schedule for: ${goals}...`
+      }
+    ]
   });
 
   const raw = response.choices[0].message.content;
