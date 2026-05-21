@@ -7,12 +7,14 @@ import GlassCard from "../components/GlassCard.jsx";
 import ProgressWidgets from "../components/ProgressWidgets.jsx";
 import TimelinePlanner from "../components/TimelinePlanner.jsx";
 import TaskChecklist from "../components/TaskChecklist.jsx";
+import GanttView from "../components/GanttView.jsx";
 import { getPlans } from "../api/index.js";
 
 export default function Dashboard() {
   const [plans, setPlans] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [timelineView, setTimelineView] = useState("gantt");
 
   const fetchPlans = useCallback(async () => {
     try {
@@ -127,31 +129,77 @@ export default function Dashboard() {
                             border: "1px solid rgba(124,58,237,0.25)",
                           }}
                         >
-                          {selected.available_time}h block
+                          {selected.schedule_type || "daily"} · {selected.available_time}h
                         </div>
                       </div>
                     </GlassCard>
 
-                    <div className="grid grid-cols-2 gap-6">
-                      {/* Timeline */}
-                      <GlassCard className="p-5" delay={0.2} hover={false}>
-                        <h3 className="text-xs font-medium text-white/40 uppercase tracking-widest mb-4">
-                          Timeline
-                        </h3>
-                        <TimelinePlanner tasks={selected.tasks} />
-                      </GlassCard>
+                    {selected.schedule_type === "daily" ? (
+                      <>
+                        {/* Gantt / Timeline toggle card */}
+                        <GlassCard className="p-5" delay={0.2} hover={false}>
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xs font-medium text-white/40 uppercase tracking-widest">
+                              {timelineView === "gantt" ? "Gantt Chart" : "Timeline"}
+                            </h3>
+                            <div
+                              className="flex rounded-lg overflow-hidden"
+                              style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+                            >
+                              {[
+                                {
+                                  key: "gantt", label: "Gantt",
+                                  icon: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 6h6M3 12h10M3 18h4" /></svg>,
+                                },
+                                {
+                                  key: "list", label: "List",
+                                  icon: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12M8.25 17.25h12M3.75 6.75h.007v.008H3.75V6.75zm0 5.25h.007v.008H3.75V12zm0 5.25h.007v.008H3.75v-.008z" /></svg>,
+                                },
+                              ].map(({ key, label, icon }) => (
+                                <button
+                                  key={key}
+                                  onClick={() => setTimelineView(key)}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium transition-all duration-150"
+                                  style={{
+                                    background: timelineView === key ? "rgba(124,58,237,0.25)" : "transparent",
+                                    color: timelineView === key ? "#a78bfa" : "rgba(255,255,255,0.3)",
+                                  }}
+                                >
+                                  {icon}{label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          {timelineView === "gantt"
+                            ? <GanttView tasks={selected.tasks} />
+                            : <TimelinePlanner tasks={selected.tasks} />}
+                        </GlassCard>
 
-                      {/* Checklist */}
-                      <GlassCard className="p-5" delay={0.25} hover={false}>
-                        <h3 className="text-xs font-medium text-white/40 uppercase tracking-widest mb-4">
-                          Task Checklist
-                        </h3>
-                        <TaskChecklist
-                          tasks={selected.tasks}
-                          onUpdate={refreshSelected}
-                        />
-                      </GlassCard>
-                    </div>
+                        {/* Checklist below */}
+                        <GlassCard className="p-5" delay={0.25} hover={false}>
+                          <h3 className="text-xs font-medium text-white/40 uppercase tracking-widest mb-4">
+                            Task Checklist
+                          </h3>
+                          <TaskChecklist tasks={selected.tasks} onUpdate={refreshSelected} />
+                        </GlassCard>
+                      </>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-6">
+                        {/* Non-daily: side by side timeline + checklist */}
+                        <GlassCard className="p-5" delay={0.2} hover={false}>
+                          <h3 className="text-xs font-medium text-white/40 uppercase tracking-widest mb-4">
+                            Timeline
+                          </h3>
+                          <TimelinePlanner tasks={selected.tasks} />
+                        </GlassCard>
+                        <GlassCard className="p-5" delay={0.25} hover={false}>
+                          <h3 className="text-xs font-medium text-white/40 uppercase tracking-widest mb-4">
+                            Task Checklist
+                          </h3>
+                          <TaskChecklist tasks={selected.tasks} onUpdate={refreshSelected} />
+                        </GlassCard>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
