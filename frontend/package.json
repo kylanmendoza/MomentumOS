@@ -20,5 +20,12 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "vite": "^5.2.13"
+  }, 
+  "tasks": {
+    "time": "9:00 AM - 10:30 AM",
+    "task": "Write authentication module",
+    "category": "deep_work",
+    "priority": "high",
+    "energy_required": "high"
   }
 }

@@ -1,0 +1,15 @@
+# Vultr deployment — API only, uses managed/external PostgreSQL via DATABASE_URL
+# Frontend is hosted separately (e.g. Render, Vercel, Netlify)
+# Usage: docker compose -f docker-compose.vultr.yml up -d --build
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: ./backend/.env
+    ports:
+      - "3001:3001"
+    environment:
+      CORS_ORIGINS: ${CORS_ORIGINS}

@@ -14,7 +14,7 @@ export async function generatePlan(req, res, next) {
     res.json({ schedule });
   } catch (err) {
     next(err);
-  }
+  } 
 }
 
 export async function savePlan(req, res, next) {

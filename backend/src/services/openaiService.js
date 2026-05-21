@@ -2,53 +2,66 @@ import OpenAI from "openai";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+const SYSTEM_PROMPT = `You are an elite productivity coach and scheduling expert.
+Your schedules are:
+- Realistic and never over-packed
+- Structured around human energy patterns (peak focus in the morning, admin mid-day, wind-down later)
+- Specific and actionable — never vague
+- Always inclusive of cognitive breaks
+- Sensitive to the user's stated priorities and constraints
+
+Each task in your output must include:
+- "time": the time block or period label
+- "task": a specific, actionable description
+- "category": one of "deep_work" | "admin" | "creative" | "break" | "review" | "personal"
+- "priority": one of "high" | "medium" | "low"
+
+You output ONLY valid JSON arrays. Never explain yourself or add markdown.`;
+
 const PROMPT_CONFIG = {
   daily: {
     unit: "time blocks within a single day",
-    timeFormat: `"H:MM AM - H:MM PM"`,
-    example: `{ "time": "9:00 AM - 9:45 AM", "task": "..." }`,
+    example: `{ "time": "9:00 AM - 9:45 AM", "task": "...", "category": "deep_work", "priority": "high" }`,
     rules: [
-      "Break the day into focused time blocks",
-      "Use standard 12-hour AM/PM time format",
-      "Include a short break every 90 minutes",
-      "Make tasks actionable and specific",
+      "Break the day into focused time blocks using 12-hour AM/PM format",
+      "Schedule high-priority and cognitively demanding tasks in the morning",
+      "Include a short break (if it is specified) to requested break time",
+      "Avoid scheduling deep work after 4 PM",
+      "Make tasks actionable and specific — no vague entries",
       "Keep it realistic for one day",
     ],
   },
   weekly: {
     unit: "days of the week",
-    timeFormat: `"Day of week (e.g. Monday, Tuesday)"`,
-    example: `{ "time": "Monday", "task": "..." }`,
+    example: `{ "time": "Monday", "task": "...", "category": "deep_work", "priority": "high" }`,
     rules: [
       "Assign goals to specific days of the week",
-      "Distribute workload evenly — avoid overloading one day",
-      "Include at least one rest or review day",
+      "Front-load high-priority work early in the week (Monday–Wednesday)",
+      "Reserve Friday for review, wrap-up, and planning ahead",
+      "Include at least one lighter or recovery day",
       "Group related tasks on the same day when possible",
-      "Keep each day's task description concise and actionable",
     ],
   },
   monthly: {
     unit: "weeks of the month",
-    timeFormat: `"Week N (e.g. Week 1, Week 2)"`,
-    example: `{ "time": "Week 1", "task": "..." }`,
+    example: `{ "time": "Week 1", "task": "...", "category": "deep_work", "priority": "high" }`,
     rules: [
       "Divide goals across 4 weeks",
-      "Week 1 should focus on setup and planning",
-      "Week 4 should include review and wrap-up",
+      "Week 1: setup, research, and planning",
+      "Week 2–3: execution and deep work",
+      "Week 4: review, polish, and wrap-up",
       "Make each week's objective measurable",
-      "Space out milestones realistically",
     ],
   },
   yearly: {
     unit: "months of the year",
-    timeFormat: `"Month name (e.g. January, February)"`,
-    example: `{ "time": "January", "task": "..." }`,
+    example: `{ "time": "January", "task": "...", "category": "deep_work", "priority": "high" }`,
     rules: [
       "Assign major goals or milestones to specific months",
-      "Group related objectives in the same quarter",
-      "Include review months (March, June, September, December)",
-      "Keep each month's focus broad but meaningful",
+      "Group related objectives within the same quarter",
+      "Schedule review months at end of each quarter",
       "Ensure the year builds progressively toward the main goals",
+      "Balance ambition with realistic pacing",
     ],
   },
 };
@@ -56,24 +69,30 @@ const PROMPT_CONFIG = {
 export async function generateSchedule({ goals, hours, scheduleType = "daily" }) {
   const config = PROMPT_CONFIG[scheduleType] || PROMPT_CONFIG.daily;
 
-  const prompt = `You are an expert productivity planner.
+  const now = new Date();
+  const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
+  const currentTime = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const dateStr = now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+  const userPrompt = `Today is ${dayName}, ${dateStr}. Current time: ${currentTime}.
 
 Create a structured ${scheduleType} schedule organized by ${config.unit}, based on:
 - Goals: ${goals}
-- Available time: ${hours} hours${scheduleType === "daily" ? " per day" : " total"}
+- Available time: ${hours} hours${scheduleType === "daily" ? " — schedule from the current time onward" : " total"}
 
 Rules:
 ${config.rules.map((r) => `- ${r}`).join("\n")}
-- Output ONLY valid JSON — no markdown, no explanation:
 
-[
-  ${config.example}
-]`;
+Output a JSON array. Each object must match this shape exactly:
+${config.example}`;
 
   const response = await client.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.7,
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: userPrompt },
+    ],
+    temperature: 0.65,
     response_format: { type: "json_object" },
   });
 
