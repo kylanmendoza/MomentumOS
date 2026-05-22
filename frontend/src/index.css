@@ -84,3 +84,133 @@
     background: rgba(124, 58, 237, 0.08);
   }
 }
+
+/* ─── FullCalendar dark theme ─────────────────────────────────────────────── */
+.fc {
+  --fc-border-color: rgba(255, 255, 255, 0.07);
+  --fc-today-bg-color: rgba(124, 58, 237, 0.07);
+  --fc-now-indicator-color: #f87171;
+  --fc-event-bg-color: rgba(124, 58, 237, 0.55);
+  --fc-event-border-color: #7c3aed;
+  --fc-event-text-color: #ffffff;
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgba(255, 255, 255, 0.02);
+  --fc-neutral-text-color: rgba(255, 255, 255, 0.35);
+  --fc-highlight-color: rgba(124, 58, 237, 0.12);
+  --fc-non-business-color: rgba(0, 0, 0, 0.08);
+  --fc-button-bg-color: rgba(124, 58, 237, 0.2);
+  --fc-button-border-color: rgba(124, 58, 237, 0.35);
+  --fc-button-hover-bg-color: rgba(124, 58, 237, 0.35);
+  --fc-button-hover-border-color: rgba(124, 58, 237, 0.55);
+  --fc-button-active-bg-color: rgba(124, 58, 237, 0.5);
+  --fc-button-active-border-color: #7c3aed;
+  --fc-button-text-color: rgba(255, 255, 255, 0.85);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th,
+.fc-theme-standard .fc-scrollgrid {
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.fc .fc-col-header-cell-cushion {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.fc .fc-timegrid-slot-label-cushion {
+  color: rgba(255, 255, 255, 0.28);
+  font-size: 10px;
+}
+
+.fc .fc-daygrid-day-number {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+.fc .fc-timegrid-now-indicator-line {
+  border-color: #f87171;
+  border-width: 2px;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  border-top-color: #f87171;
+  border-bottom-color: #f87171;
+}
+
+.fc .fc-event {
+  border-radius: 6px;
+  border-width: 1px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.fc .fc-event:hover {
+  filter: brightness(1.15);
+}
+
+.fc .fc-event-title {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fc .fc-event-time {
+  font-size: 9px;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+.fc .fc-toolbar-title {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.fc .fc-button {
+  border-radius: 8px;
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+.fc .fc-button:focus {
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.4);
+}
+
+.fc .fc-daygrid-event {
+  border-radius: 4px;
+}
+
+.fc .fc-more-link {
+  color: #a78bfa;
+  font-size: 10px;
+}
+
+.fc .fc-popover {
+  background: #12121f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.fc .fc-popover-header {
+  background: rgba(124, 58, 237, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  border-radius: 12px 12px 0 0;
+}
+
+.fc-v-event .fc-event-main {
+  padding: 2px 4px;
+}

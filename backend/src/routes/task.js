@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { toggleTask } from "../controllers/taskController.js";
+import { updateTask } from "../controllers/taskController.js";
 
 const router = Router();
 
-router.patch("/:id", toggleTask);
+router.patch("/:id", updateTask);
 
 export default router;

@@ -7,14 +7,14 @@ import GlassCard from "../components/GlassCard.jsx";
 import ProgressWidgets from "../components/ProgressWidgets.jsx";
 import TimelinePlanner from "../components/TimelinePlanner.jsx";
 import TaskChecklist from "../components/TaskChecklist.jsx";
-import GanttView from "../components/GanttView.jsx";
+import CalendarView from "../components/CalendarView.jsx";
 import { getPlans } from "../api/index.js";
 
 export default function Dashboard() {
   const [plans, setPlans] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [timelineView, setTimelineView] = useState("gantt");
+  const [timelineView, setTimelineView] = useState("calendar");
 
   const fetchPlans = useCallback(async () => {
     try {
@@ -140,7 +140,7 @@ export default function Dashboard() {
                         <GlassCard className="p-5" delay={0.2} hover={false}>
                           <div className="flex items-center justify-between mb-4">
                             <h3 className="text-xs font-medium text-white/40 uppercase tracking-widest">
-                              {timelineView === "gantt" ? "Gantt Chart" : "Timeline"}
+                              {timelineView === "calendar" ? "Calendar" : "Timeline"}
                             </h3>
                             <div
                               className="flex rounded-lg overflow-hidden"
@@ -148,8 +148,8 @@ export default function Dashboard() {
                             >
                               {[
                                 {
-                                  key: "gantt", label: "Gantt",
-                                  icon: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 6h6M3 12h10M3 18h4" /></svg>,
+                                  key: "calendar", label: "Calendar",
+                                  icon: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>,
                                 },
                                 {
                                   key: "list", label: "List",
@@ -170,8 +170,8 @@ export default function Dashboard() {
                               ))}
                             </div>
                           </div>
-                          {timelineView === "gantt"
-                            ? <GanttView tasks={selected.tasks} />
+                          {timelineView === "calendar"
+                            ? <CalendarView plan={selected} onUpdate={refreshSelected} />
                             : <TimelinePlanner tasks={selected.tasks} />}
                         </GlassCard>
 
@@ -184,13 +184,13 @@ export default function Dashboard() {
                         </GlassCard>
                       </>
                     ) : (
-                      <div className="grid grid-cols-2 gap-6">
-                        {/* Non-daily: side by side timeline + checklist */}
+                      <div className="space-y-6">
+                        {/* Non-daily: full-width calendar + checklist below */}
                         <GlassCard className="p-5" delay={0.2} hover={false}>
                           <h3 className="text-xs font-medium text-white/40 uppercase tracking-widest mb-4">
-                            Timeline
+                            Calendar
                           </h3>
-                          <TimelinePlanner tasks={selected.tasks} />
+                          <CalendarView plan={selected} onUpdate={refreshSelected} />
                         </GlassCard>
                         <GlassCard className="p-5" delay={0.25} hover={false}>
                           <h3 className="text-xs font-medium text-white/40 uppercase tracking-widest mb-4">
