@@ -7,10 +7,10 @@ import GlassCard from "../components/GlassCard.jsx";
 import AIGenerationForm from "../components/AIGenerationForm.jsx";
 
 const tips = [
-  "Be specific with goals — 'Write blog post intro' beats 'write'",
-  "Include your energy peaks — morning focus or afternoon momentum?",
-  "Add buffer time — the AI will schedule breaks for you",
-  "Combine tasks — list everything, the AI prioritizes it",
+  "Be specific — 'Write the hero section' beats 'work on landing page'",
+  "Mention times if you have them — 'standup at 10 AM, gym at 6 PM'",
+  "Say the horizon — 'today', 'this week', 'plan my month'",
+  "List everything — the AI will prioritize and group it for you",
 ];
 
 export default function CreatePlan() {
@@ -80,9 +80,9 @@ export default function CreatePlan() {
                 </h3>
                 <div className="space-y-4">
                   {[
-                    { step: "01", label: "Input your goals", detail: "Describe what you want to accomplish today" },
-                    { step: "02", label: "AI structures your day", detail: "GPT-4o creates time blocks with breaks" },
-                    { step: "03", label: "Review & save", detail: "Confirm the schedule and track it live" },
+                    { step: "01", label: "Describe your goals", detail: "Write naturally — mention times, days, or horizons" },
+                    { step: "02", label: "AI builds the schedule", detail: "Detects daily/weekly/monthly/yearly and structures it" },
+                    { step: "03", label: "Review & save", detail: "Confirm the plan, then edit it live on the dashboard" },
                   ].map((s) => (
                     <div key={s.step} className="flex gap-3">
                       <span

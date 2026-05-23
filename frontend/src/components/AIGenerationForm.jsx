@@ -3,25 +3,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { generatePlan, savePlan } from "../api/index.js";
 import { toStandardTime } from "../utils/time.js";
 
-const SCHEDULE_TYPES = [
-  { value: "daily",   label: "Daily",   desc: "Time-blocked schedule for one day" },
-  { value: "weekly",  label: "Weekly",  desc: "Goals spread across 7 days" },
-  { value: "monthly", label: "Monthly", desc: "Milestones across 4 weeks" },
-  { value: "yearly",  label: "Yearly",  desc: "High-level goals by month" },
-];
-
-const PLACEHOLDERS = {
-  goals:
-    "e.g. Finish the product landing page, review pull requests, workout 30 min",
-  priorities: "e.g. High-energy work in the morning, leave buffer for email",
+const SCHEDULE_LABEL = {
+  daily:   "Daily",
+  weekly:  "Weekly",
+  monthly: "Monthly",
+  yearly:  "Yearly",
 };
 
 export default function AIGenerationForm({ onSaved }) {
-  const [form, setForm] = useState({ title: "", goals: "", hours: 8, priorities: "", scheduleType: "daily" });
-  const [loading, setLoading] = useState(false);
-  const [preview, setPreview] = useState(null);
-  const [error, setError] = useState(null);
-  const [saved, setSaved] = useState(false);
+  const [form,         setForm]         = useState({ title: "", goals: "" });
+  const [loading,      setLoading]      = useState(false);
+  const [preview,      setPreview]      = useState(null);     // { scheduleType, tasks }
+  const [error,        setError]        = useState(null);
+  const [saved,        setSaved]        = useState(false);
 
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -37,12 +31,8 @@ export default function AIGenerationForm({ onSaved }) {
     setPreview(null);
     setSaved(false);
     try {
-      const res = await generatePlan({
-        goals: form.priorities ? `${form.goals}. Priorities: ${form.priorities}` : form.goals,
-        hours: Number(form.hours),
-        scheduleType: form.scheduleType,
-      });
-      setPreview(res.data.schedule);
+      const res = await generatePlan({ goals: form.goals });
+      setPreview({ scheduleType: res.data.scheduleType, tasks: res.data.schedule });
     } catch (err) {
       setError(err.response?.data?.error || "Generation failed. Check your API key.");
     } finally {
@@ -55,15 +45,15 @@ export default function AIGenerationForm({ onSaved }) {
     setLoading(true);
     try {
       await savePlan({
-        title: form.title || `${form.scheduleType.charAt(0).toUpperCase() + form.scheduleType.slice(1)} Plan — ${new Date().toLocaleDateString()}`,
-        goals: form.goals,
-        available_time: Number(form.hours),
-        schedule_type: form.scheduleType,
-        tasks: preview,
+        title: form.title ||
+          `${SCHEDULE_LABEL[preview.scheduleType] || "Plan"} — ${new Date().toLocaleDateString()}`,
+        goals:         form.goals,
+        schedule_type: preview.scheduleType,
+        tasks:         preview.tasks,
       });
       setSaved(true);
       setPreview(null);
-      setForm({ title: "", goals: "", hours: 8, priorities: "" });
+      setForm({ title: "", goals: "" });
       onSaved?.();
     } catch (err) {
       setError(err.response?.data?.error || "Failed to save plan.");
@@ -86,115 +76,28 @@ export default function AIGenerationForm({ onSaved }) {
             onChange={handleChange}
             placeholder="My Focus Day"
             className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 outline-none transition-all"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-            onFocus={(e) =>
-              (e.target.style.borderColor = "rgba(124,58,237,0.5)")
-            }
-            onBlur={(e) =>
-              (e.target.style.borderColor = "rgba(255,255,255,0.08)")
-            }
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+            onFocus={(e) => (e.target.style.borderColor = "rgba(124,58,237,0.5)")}
+            onBlur={(e)  => (e.target.style.borderColor = "rgba(255,255,255,0.08)")}
           />
-        </div>
-
-        {/* Schedule Type */}
-        <div>
-          <label className="block text-xs font-medium text-white/40 uppercase tracking-widest mb-2">
-            Schedule Type
-          </label>
-          <div className="grid grid-cols-4 gap-2">
-            {SCHEDULE_TYPES.map((type) => (
-              <button
-                key={type.value}
-                type="button"
-                onClick={() => setForm((f) => ({ ...f, scheduleType: type.value }))}
-                className="flex flex-col items-center gap-1 p-2.5 rounded-xl text-center transition-all duration-200"
-                style={{
-                  background: form.scheduleType === type.value
-                    ? "rgba(124,58,237,0.2)"
-                    : "rgba(255,255,255,0.03)",
-                  border: form.scheduleType === type.value
-                    ? "1px solid rgba(124,58,237,0.5)"
-                    : "1px solid rgba(255,255,255,0.06)",
-                }}
-              >
-                <span className="text-xs font-medium text-white/80">{type.label}</span>
-                <span className="text-[10px] text-white/30 leading-tight">{type.desc}</span>
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Goals */}
         <div>
           <label className="block text-xs font-medium text-white/40 uppercase tracking-widest mb-2">
-            Goals & Tasks *
+            What do you want to accomplish? *
           </label>
           <textarea
             name="goals"
             value={form.goals}
             onChange={handleChange}
             required
-            rows={3}
-            placeholder={PLACEHOLDERS.goals}
-            className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 outline-none transition-all resize-none"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-            onFocus={(e) =>
-              (e.target.style.borderColor = "rgba(124,58,237,0.5)")
-            }
-            onBlur={(e) =>
-              (e.target.style.borderColor = "rgba(255,255,255,0.08)")
-            }
-          />
-        </div>
-
-        {/* Hours */}
-        <div>
-          <label className="block text-xs font-medium text-white/40 uppercase tracking-widest mb-2">
-            Available Hours: {form.hours}h
-          </label>
-          <input
-            type="range"
-            name="hours"
-            min={1}
-            max={16}
-            value={form.hours}
-            onChange={handleChange}
-            className="w-full accent-violet-500"
-          />
-          <div className="flex justify-between text-[10px] text-white/20 mt-1">
-            <span>1h</span>
-            <span>8h</span>
-            <span>16h</span>
-          </div>
-        </div>
-
-        {/* Priorities */}
-        <div>
-          <label className="block text-xs font-medium text-white/40 uppercase tracking-widest mb-2">
-            Optional Priorities
-          </label>
-          <input
-            name="priorities"
-            value={form.priorities}
-            onChange={handleChange}
-            placeholder={PLACEHOLDERS.priorities}
-            className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 outline-none transition-all"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-            onFocus={(e) =>
-              (e.target.style.borderColor = "rgba(124,58,237,0.5)")
-            }
-            onBlur={(e) =>
-              (e.target.style.borderColor = "rgba(255,255,255,0.08)")
-            }
+            rows={5}
+            placeholder={`Describe your goals naturally — the AI handles the rest.\n\ne.g. "I need to finish the landing page today, review PRs at 2 PM, and work out for 30 min"\nor "Plan my week: Monday tackle auth bugs, Wednesday team sync, Friday deploy"`}
+            className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 outline-none transition-all resize-none leading-relaxed"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+            onFocus={(e) => (e.target.style.borderColor = "rgba(124,58,237,0.5)")}
+            onBlur={(e)  => (e.target.style.borderColor = "rgba(255,255,255,0.08)")}
           />
         </div>
 
@@ -226,7 +129,7 @@ export default function AIGenerationForm({ onSaved }) {
                 animate={{ rotate: 360 }}
                 transition={{ duration: 0.7, repeat: Infinity, ease: "linear" }}
               />
-              Generating...
+              Generating…
             </>
           ) : (
             <>
@@ -248,11 +151,24 @@ export default function AIGenerationForm({ onSaved }) {
             exit={{ opacity: 0 }}
             className="space-y-3"
           >
-            <p className="text-xs text-white/40 uppercase tracking-widest">
-              Preview — {preview.length} blocks
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-white/40 uppercase tracking-widest">
+                Preview — {preview.tasks.length} blocks
+              </p>
+              <span
+                className="px-2.5 py-1 rounded-full text-[10px] font-medium"
+                style={{
+                  background: "rgba(124,58,237,0.15)",
+                  color:      "#a78bfa",
+                  border:     "1px solid rgba(124,58,237,0.3)",
+                }}
+              >
+                {SCHEDULE_LABEL[preview.scheduleType] || preview.scheduleType}
+              </span>
+            </div>
+
             <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
-              {preview.map((block, i) => (
+              {preview.tasks.map((block, i) => (
                 <div
                   key={i}
                   className="flex gap-3 p-2.5 rounded-lg text-sm"
@@ -265,6 +181,7 @@ export default function AIGenerationForm({ onSaved }) {
                 </div>
               ))}
             </div>
+
             <div className="flex gap-3">
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -275,10 +192,7 @@ export default function AIGenerationForm({ onSaved }) {
               >
                 Save to Dashboard
               </motion.button>
-              <button
-                onClick={() => setPreview(null)}
-                className="btn-ghost text-sm"
-              >
+              <button onClick={() => setPreview(null)} className="btn-ghost text-sm">
                 Discard
               </button>
             </div>
