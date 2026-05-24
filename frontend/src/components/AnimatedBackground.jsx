@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 export default function AnimatedBackground() {
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
       {/* Deep base */}
       <div className="absolute inset-0 bg-[#06060f]" />
 
@@ -47,12 +47,7 @@ export default function AnimatedBackground() {
           filter: "blur(60px)",
         }}
         animate={{ x: [0, -25, 0], y: [0, 20, 0] }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 2,
-        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
       />
 
       {/* Accent mid orb */}

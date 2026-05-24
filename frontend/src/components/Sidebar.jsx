@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const navItems = [
@@ -43,12 +43,14 @@ const navItems = [
 ];
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  
   return (
     <motion.aside
       initial={{ x: -40, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="fixed left-0 top-0 h-full w-64 z-30 flex flex-col"
+      className="fixed top-0 left-0 z-30 flex flex-col w-64 h-full"
       style={{
         background: "rgba(13,13,26,0.85)",
         backdropFilter: "blur(20px)",
@@ -59,11 +61,12 @@ export default function Sidebar() {
       <div className="p-6 pb-4">
         <div className="flex items-center gap-2.5">
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            className="flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer"
             style={{
               background: "linear-gradient(135deg, #7c3aed, #22d3ee)",
               boxShadow: "0 0 16px rgba(124,58,237,0.5)",
             }}
+            onClick={() => navigate("/")}
           >
             <svg
               className="w-4 h-4 text-white"
@@ -73,9 +76,14 @@ export default function Sidebar() {
               <path d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <span className="font-display font-semibold text-base tracking-tight text-white">
-            MomentumOS
-          </span>
+          <div 
+            onClick={() => navigate("/")}
+            className="cursor-pointer"
+          >
+            <span className="text-base font-semibold tracking-tight text-white font-display">
+              MomentumOS
+            </span>
+          </div>
         </div>
       </div>
 
@@ -117,7 +125,7 @@ export default function Sidebar() {
       {/* Bottom badge */}
       <div className="p-4">
         <div
-          className="glass rounded-xl p-3 text-center"
+          className="p-3 text-center glass rounded-xl"
           style={{ border: "1px solid rgba(124,58,237,0.2)" }}
         >
           <p className="text-[11px] text-white/30 uppercase tracking-widest mb-1">
