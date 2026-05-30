@@ -14,12 +14,17 @@
     "@splinetool/react-spline": "^4.1.0",
     "@use-gesture/react": "^10.3.1",
     "axios": "^1.7.2",
-    "framer-motion": "^11.2.10",
+    "framer-motion": "^12.0.0-alpha.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",
     "three": "^0.184.0"
   },
+  "overrides": {
+  "framer-motion": {
+    "react": "19.0.0-rc-66855b96-20241106",
+    "react-dom": "19.0.0-rc-66855b96-20241106"
+  }},
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.0",
     "autoprefixer": "^10.4.19",

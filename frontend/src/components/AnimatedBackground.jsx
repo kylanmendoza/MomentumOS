@@ -8,7 +8,7 @@ export default function AnimatedBackground() {
 
       {/* Grid lines */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.08]"
         style={{
           backgroundImage: `
             linear-gradient(rgba(167,139,250,1) 1px, transparent 1px),
@@ -27,7 +27,7 @@ export default function AnimatedBackground() {
           top: "-20%",
           left: "-10%",
           background:
-            "radial-gradient(circle, rgba(109,40,217,0.18) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(109,40,217,0.45) 0%, transparent 70%)",
           filter: "blur(60px)",
         }}
         animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
@@ -43,7 +43,7 @@ export default function AnimatedBackground() {
           bottom: "-15%",
           right: "-5%",
           background:
-            "radial-gradient(circle, rgba(34,211,238,0.12) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(34,211,238,0.35) 0%, transparent 70%)",
           filter: "blur(60px)",
         }}
         animate={{ x: [0, -25, 0], y: [0, 20, 0] }}

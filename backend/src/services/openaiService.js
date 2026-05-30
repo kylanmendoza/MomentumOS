@@ -57,7 +57,7 @@ export async function generateSchedule({ goals }) {
 
   const userPrompt = `Today is ${dayName}, ${dateStr}. Current time: ${timeStr}.
 
-${goals}`;
+  ${goals}`;
 
   const response = await client.chat.completions.create({
     model: "gpt-4o",
