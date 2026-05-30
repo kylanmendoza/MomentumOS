@@ -15,7 +15,6 @@ export default function Dashboard() {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timelineView, setTimelineView] = useState("list"); // "list" or "3d"
-
   const fetchPlans = useCallback(async () => {
     try {
       const res = await getPlans();

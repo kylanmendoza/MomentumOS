@@ -23,7 +23,7 @@ function CalendarView({ plan }) {
   }
 
   return (
-    <div class="flex items-center justify-center py-8 px-4">
+    <div className="flex items-center justify-center px-4 py-8">
 {/* <!--- more free and premium Tailwind CSS components at https://tailwinduikit.com/ ---> */}
 
             <div className="w-full max-w-sm shadow-lg">
@@ -89,11 +89,11 @@ function CalendarView({ plan }) {
                             </thead>
                             <tbody>
                                 {rows.map((row, rowindex) => (
-                                    <tr key={rowIndex}>
+                                    <tr key={rowindex}>
                                         {row.map((cell, cellIndex) => (
-                                            <td key={colIndex} className="pt-6">
+                                            <td key={cellIndex} className="pt-6">
                                                 <div className="flex justify-center w-full px-2 py-2">
-                                                    {day && <p className="text-base font-medium text-gray-300 dark:text-gray-100">{day}</p>}
+                                                    {cell && <p className="text-base font-medium text-gray-300 dark:text-gray-100">{cell}</p>}
                                                 </div>
                                             </td>
                                         ))}
