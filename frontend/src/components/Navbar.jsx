@@ -22,7 +22,7 @@ export default function Navbar({ title = "Dashboard" }) {
       }}
     >
       <div>
-        <h1 className="font-display font-semibold text-lg text-white tracking-tight">
+        <h1 className="text-lg font-semibold tracking-tight text-white font-display">
           {title}
         </h1>
         <p className="text-xs text-white/30 mt-0.5">{dateStr}</p>
@@ -33,7 +33,7 @@ export default function Navbar({ title = "Dashboard" }) {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            className="btn-primary text-white"
+            className="text-white btn-primary"
           >
             + New Plan
           </motion.button>

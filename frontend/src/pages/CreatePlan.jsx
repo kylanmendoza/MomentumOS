@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar.jsx";
 import Navbar from "../components/Navbar.jsx";
 import GlassCard from "../components/GlassCard.jsx";
 import AIGenerationForm from "../components/AIGenerationForm.jsx";
+import { useSidebar } from "../components/SidebarContext.jsx";
 
 const tips = [
   "Be specific — 'Write the hero section' beats 'work on landing page'",
@@ -15,6 +16,7 @@ const tips = [
 
 export default function CreatePlan() {
   const navigate = useNavigate();
+  const { isOpen } = useSidebar();
 
   function handleSaved() {
     setTimeout(() => navigate("/dashboard"), 1200);
@@ -25,7 +27,13 @@ export default function CreatePlan() {
       <AnimatedBackground />
       <Sidebar />
 
-      <div className="pl-64 relative z-10 min-h-screen flex flex-col">
+      <div
+        className="relative z-10 min-h-screen flex flex-col"
+        style={{
+          paddingLeft: isOpen ? "250px" : "96px",
+          transition: "padding-left 0.45s cubic-bezier(0.25,0.46,0.45,0.94)",
+        }}
+      >
         <Navbar title="New Plan" />
 
         <main className="flex-1 p-8">

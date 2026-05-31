@@ -8,9 +8,11 @@ import ProgressWidgets from "../components/ProgressWidgets.jsx";
 import TimelinePlanner from "../components/TimelinePlanner.jsx";
 import CalendarView from "../components/CalendarView.jsx";
 import TaskChecklist from "../components/TaskChecklist.jsx";
+import { useSidebar } from "../components/SidebarContext.jsx";
 import { getPlans } from "../api/index.js";
 
 export default function Dashboard() {
+  const { isOpen } = useSidebar();
   const [plans, setPlans] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,7 +47,13 @@ export default function Dashboard() {
       <AnimatedBackground />
       <Sidebar />
 
-      <div className="relative z-10 flex flex-col min-h-screen pl-64">
+      <div
+        className="relative z-10 flex flex-col min-h-screen"
+        style={{
+          paddingLeft: isOpen ? "250px" : "96px",
+          transition: "padding-left 0.45s cubic-bezier(0.25,0.46,0.45,0.94)",
+        }}
+      >
         <Navbar title="Dashboard" />
 
         <main className="flex-1 p-8">

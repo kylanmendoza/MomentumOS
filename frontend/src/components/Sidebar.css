@@ -1,0 +1,122 @@
+.sidebar {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    bottom: 20px;
+    border-radius: 14px;
+    width: 56px;
+    background:
+        rgba(0 0 0 / 12%);
+    backdrop-filter:
+        blur(10px);
+    transition: width 0.45s;
+    overflow: hidden;
+    z-index: 40;
+}
+
+.sidebar button {
+    border: 0;
+    background: transparent;
+}
+
+/* Fix 2: was `.sidebar .open` (descendant selector) — must be `.sidebar.open` */
+.sidebar.open {
+    width: 210px;
+}
+
+.sidebar .inner {
+    position: absolute;
+    inset: 0;
+}
+
+.sidebar header {
+    display: flex;
+    align-items: center;
+    height: 64px;
+    padding: 0 6px;
+}
+
+.sidebar-burger {
+    width: 44px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    color: #f9f9f9;
+}
+
+.sidebar nav {
+    flex: 1 1 auto;
+    display: grid;
+    padding: 0 6px;
+    gap: 2px;
+}
+
+/* Fix 5: NavLink renders <a>, not <button> */
+.sidebar
+nav >
+a:hover {
+    background:
+        rgba(255 255 255 / 6%);
+    opacity: 1;
+}
+
+.sidebar nav > a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0px 12px;
+    border-radius: 8px;
+    color: #f9f9f9;
+    opacity: 0.6;
+    height: 44px;
+    width: 44px;
+    transition: 0.3s;
+    line-height: 1;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sidebar:not(.open)
+nav > a:hover p::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -4px;
+    height: 8px;
+    width: 8px;
+    translate: 0 -50%;
+    transform: rotate(45deg);
+    border-radius: 1px;
+    background: inherit;
+}
+
+/* Fix 4: was `header > img` — logo is a div with class .logo, not an <img> */
+.sidebar header .logo,
+.sidebar nav > a p {
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.25s;
+}
+
+.sidebar.open
+:is(nav
+    a p,
+    header .logo
+) {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sidebar.open nav > a {
+    width: 100%
+}
+
+.sidebar:not(.open)
+nav > a:hover p {
+    position: relative;
+    opacity: 1;
+    background: #121113;
+    padding: 8px 12px;
+    border-radius: 6px;
+    translate: 16px 0;
+}
