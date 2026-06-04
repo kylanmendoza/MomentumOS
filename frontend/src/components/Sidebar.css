@@ -63,8 +63,6 @@ a:hover {
 .sidebar nav > a {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 0px 12px;
     border-radius: 8px;
     color: #f9f9f9;
     opacity: 0.6;

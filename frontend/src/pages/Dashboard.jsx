@@ -5,9 +5,7 @@ import Sidebar from "../components/Sidebar.jsx";
 import Navbar from "../components/Navbar.jsx";
 import GlassCard from "../components/GlassCard.jsx";
 import ProgressWidgets from "../components/ProgressWidgets.jsx";
-import TimelinePlanner from "../components/TimelinePlanner.jsx";
 import CalendarView from "../components/CalendarView.jsx";
-import TaskChecklist from "../components/TaskChecklist.jsx";
 import { useSidebar } from "../components/SidebarContext.jsx";
 import { getPlans } from "../api/index.js";
 
@@ -16,7 +14,6 @@ export default function Dashboard() {
   const [plans, setPlans] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [timelineView, setTimelineView] = useState("list"); // "list" or "3d"
   const fetchPlans = useCallback(async () => {
     try {
       const res = await getPlans();
@@ -56,7 +53,7 @@ export default function Dashboard() {
       >
         <Navbar title="Dashboard" />
 
-        <main className="flex-1 p-8">
+        <main className="flex-1 px-8 pt-4 pb-6">
           {loading ? (
             <div className="flex items-center justify-center h-64">
               <motion.div
@@ -113,82 +110,32 @@ export default function Dashboard() {
               </div>
 
               {/* Right column */}
-              <div className="col-span-8 space-y-6">
+              <div className="col-span-8">
                 {selected && (
-                  <>
-                    {/* Plan header */}
-                    <GlassCard className="p-6" delay={0.15} hover={false}>
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h2 className="text-xl font-semibold text-white font-display">
-                            {selected.title}
-                          </h2>
-                          <p className="max-w-xl mt-1 text-sm leading-relaxed text-white/35">
-                            {selected.goals}
-                          </p>
-                        </div>
-                        <div
-                          className="px-3 py-1.5 rounded-full text-xs font-medium"
-                          style={{
-                            background: "rgba(124,58,237,0.12)",
-                            color: "#a78bfa",
-                            border: "1px solid rgba(124,58,237,0.25)",
-                          }}
-                        >
-                          {selected.schedule_type || "daily"}
-                        </div>
+                  <GlassCard className="p-5" delay={0.15} hover={false}>
+                    {/* Compact plan header */}
+                    <div className="flex items-center justify-between mb-4 gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-base font-semibold text-white font-display truncate">
+                          {selected.title}
+                        </h2>
+                        <p className="text-xs text-white/35 truncate mt-0.5">
+                          {selected.goals}
+                        </p>
                       </div>
-                    </GlassCard>
-
-                    <>
-                      {/* 3D / List toggle card */}
-                      <GlassCard className="p-5" delay={0.2} hover={false}>
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xs font-medium tracking-widest uppercase text-white/40">
-                            {timelineView === "3d" ? "3D View" : "List View"}
-                          </h3>
-                          <div
-                            className="flex overflow-hidden rounded-lg"
-                            style={{ border: "1px solid rgba(255,255,255,0.08)" }}
-                          >
-                            {[
-                              {
-                                key: "3d", label: "3D",
-                                icon: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg>,
-                              },
-                              {
-                                key: "list", label: "List",
-                                icon: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12M8.25 17.25h12M3.75 6.75h.007v.008H3.75V6.75zm0 5.25h.007v.008H3.75V12zm0 5.25h.007v.008H3.75v-.008z" /></svg>,
-                              },
-                            ].map(({ key, label, icon }) => (
-                              <button
-                                key={key}
-                                onClick={() => setTimelineView(key)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium transition-all duration-150"
-                                style={{
-                                  background: timelineView === key ? "rgba(124,58,237,0.25)" : "transparent",
-                                  color: timelineView === key ? "#a78bfa" : "rgba(255,255,255,0.3)",
-                                }}
-                              >
-                                {icon}{label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                        {timelineView === "3d"
-                          ? <CalendarView plan={selected} onUpdate={refreshSelected} /> // TODO: Replace <Calendar3DView /> with whatever we build
-                          : <TimelinePlanner tasks={selected.tasks} />}
-                      </GlassCard>
-
-                      {/* Checklist below */}
-                      <GlassCard className="p-5" delay={0.25} hover={false}>
-                        <h3 className="mb-4 text-xs font-medium tracking-widest uppercase text-white/40">
-                          Task Checklist
-                        </h3>
-                        <TaskChecklist tasks={selected.tasks} onUpdate={refreshSelected} />
-                      </GlassCard>
-                    </>
-                  </>
+                      <div
+                        className="px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0"
+                        style={{
+                          background: "rgba(124,58,237,0.12)",
+                          color: "#a78bfa",
+                          border: "1px solid rgba(124,58,237,0.25)",
+                        }}
+                      >
+                        {selected.schedule_type || "daily"}
+                      </div>
+                    </div>
+                    <CalendarView plan={selected} onUpdate={refreshSelected} />
+                  </GlassCard>
                 )}
               </div>
             </div>

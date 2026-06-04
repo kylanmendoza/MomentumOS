@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { generatePlan, savePlan } from "../api/index.js";
-import { toStandardTime } from "../utils/time.js";
 
 const SCHEDULE_LABEL = {
   daily:   "Daily",
@@ -10,16 +9,21 @@ const SCHEDULE_LABEL = {
   yearly:  "Yearly",
 };
 
-export default function AIGenerationForm({ onSaved }) {
-  const [form,         setForm]         = useState({ title: "", goals: "" });
-  const [loading,      setLoading]      = useState(false);
-  const [preview,      setPreview]      = useState(null);     // { scheduleType, tasks }
-  const [error,        setError]        = useState(null);
-  const [saved,        setSaved]        = useState(false);
+export default function AIGenerationForm({ onSaved, onPreview }) {
+  const [form,    setForm]    = useState({ title: "", goals: "" });
+  const [loading, setLoading] = useState(false);
+  const [preview, setPreview] = useState(null);
+  const [error,   setError]   = useState(null);
+  const [saved,   setSaved]   = useState(false);
+
+  function setPreviewData(data) {
+    setPreview(data);
+    onPreview?.(data);
+  }
 
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-    setPreview(null);
+    setPreviewData(null);
     setSaved(false);
     setError(null);
   }
@@ -28,11 +32,11 @@ export default function AIGenerationForm({ onSaved }) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setPreview(null);
+    setPreviewData(null);
     setSaved(false);
     try {
       const res = await generatePlan({ goals: form.goals });
-      setPreview({ scheduleType: res.data.scheduleType, tasks: res.data.schedule });
+      setPreviewData({ scheduleType: res.data.scheduleType, tasks: res.data.schedule });
     } catch (err) {
       setError(err.response?.data?.error || "Generation failed. Check your API key.");
     } finally {
@@ -52,7 +56,7 @@ export default function AIGenerationForm({ onSaved }) {
         tasks:         preview.tasks,
       });
       setSaved(true);
-      setPreview(null);
+      setPreviewData(null);
       setForm({ title: "", goals: "" });
       onSaved?.();
     } catch (err) {
@@ -142,18 +146,19 @@ export default function AIGenerationForm({ onSaved }) {
         </motion.button>
       </form>
 
-      {/* Preview */}
+      {/* Save / Discard row — compact, calendar is shown in right panel */}
       <AnimatePresence>
         {preview && (
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2 }}
             className="space-y-3"
           >
             <div className="flex items-center justify-between">
               <p className="text-xs text-white/40 uppercase tracking-widest">
-                Preview — {preview.tasks.length} blocks
+                {preview.tasks.length} blocks generated
               </p>
               <span
                 className="px-2.5 py-1 rounded-full text-[10px] font-medium"
@@ -167,21 +172,6 @@ export default function AIGenerationForm({ onSaved }) {
               </span>
             </div>
 
-            <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
-              {preview.tasks.map((block, i) => (
-                <div
-                  key={i}
-                  className="flex gap-3 p-2.5 rounded-lg text-sm"
-                  style={{ background: "rgba(124,58,237,0.08)" }}
-                >
-                  <span className="text-accent-light/70 font-mono text-xs flex-shrink-0 pt-0.5">
-                    {toStandardTime(block.time)}
-                  </span>
-                  <span className="text-white/70">{block.task}</span>
-                </div>
-              ))}
-            </div>
-
             <div className="flex gap-3">
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -192,12 +182,13 @@ export default function AIGenerationForm({ onSaved }) {
               >
                 Save to Dashboard
               </motion.button>
-              <button onClick={() => setPreview(null)} className="btn-ghost text-sm">
+              <button onClick={() => setPreviewData(null)} className="btn-ghost text-sm">
                 Discard
               </button>
             </div>
           </motion.div>
         )}
+
         {saved && (
           <motion.p
             initial={{ opacity: 0 }}
