@@ -60,7 +60,7 @@ OUTPUT: a single JSON object — no markdown, no explanation.
   "tasks": [ { "time": "...", "task": "...", "category": "...", "priority": "..." } ]
 }`;
 
-export async function generateSchedule({ goals }) {
+export async function generateSchedule({ goals, previousSchedule, refinementRequest }) {
   const now      = new Date();
   const dayName  = now.toLocaleDateString("en-US", { weekday: "long" });
   const timeStr  = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
@@ -70,19 +70,29 @@ export async function generateSchedule({ goals }) {
 
   ${goals}`;
 
-  const response = await client.chat.completions.create({
+  const messages = [
+    { role: "system", content: SYSTEM_PROMPT },
+    { role: "user",   content: userPrompt    },
+  ];
+
+  if (previousSchedule && refinementRequest) {
+    messages.push(
+      { role: "assistant", content: JSON.stringify(previousSchedule) },
+      { role: "user",      content: refinementRequest },
+    );
+  }
+
+  return client.chat.completions.create({
     model: "gpt-4o",
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user",   content: userPrompt    },
-    ],
+    messages,
     temperature: 0.4,
     response_format: { type: "json_object" },
+    stream: true,
   });
+}
 
-  const parsed = JSON.parse(response.choices[0].message.content);
-
-  // Normalize — handle { scheduleType, tasks } or flat array fallback
+// Normalize — handle { scheduleType, tasks } or flat array fallback
+export function normalizeSchedule(parsed) {
   if (Array.isArray(parsed)) {
     return { scheduleType: "daily", tasks: parsed };
   }

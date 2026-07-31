@@ -1,17 +1,34 @@
 import { PrismaClient } from "@prisma/client";
-import { generateSchedule } from "../services/openaiService.js";
+import { generateSchedule, normalizeSchedule } from "../services/openaiService.js";
 
 const prisma = new PrismaClient();
 
 export async function generatePlan(req, res, next) {
   try {
-    const { goals } = req.body;
+    const { goals, previousSchedule, refinementRequest } = req.body;
     if (!goals) {
       return res.status(400).json({ error: "goals are required" });
     }
 
-    const { scheduleType, tasks } = await generateSchedule({ goals });
-    res.json({ scheduleType, schedule: tasks });
+    // Tell the browser "this is a stream, stay connected"
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    const stream = await generateSchedule({ goals, previousSchedule, refinementRequest });
+
+    // Iterate the stream - each chunk is a token from the AI model, send it to the client as an SSE event
+    let accumulate = "";
+    for await (const chunk of stream) {
+      const token = chunk.choices[0]?.delta?.content || "";
+      accumulate += token;
+      res.write(`data: ${JSON.stringify({ token })}\n\n`);
+    }
+
+    // Parse the complete JSON and send a "done" event
+    const { scheduleType, tasks } = normalizeSchedule(JSON.parse(accumulate));
+    res.write(`data: ${JSON.stringify({ done: true, scheduleType, tasks })}\n\n`);
+    res.end();
   } catch (err) {
     next(err);
   }
